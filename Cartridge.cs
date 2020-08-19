@@ -1,6 +1,6 @@
 ﻿namespace GBxUWP
 {
-    enum CartridgeType
+    public enum CartridgeType
     {
         Gameboy,
         GameboyEnhanced,
@@ -8,7 +8,7 @@
         GameboyAdvance
     }
 
-    enum CartridgeMapperType : byte
+    public enum CartridgeMapperType : byte
     {
         ROMOnly = 0x00,
 
@@ -127,7 +127,7 @@
         }
     }
 
-    class CartridgeHeader
+    public class CartridgeHeader
     {
         public string Title { get; set; }
         public CartridgeType Type { get; set; }
@@ -135,7 +135,7 @@
         public CartridgeMapperType Mapper { get; set; }
     }
 
-    class Cartridge
+    public class Cartridge
     {
         public CartridgeHeader Header { get; set; }
 

@@ -30,7 +30,7 @@ namespace GBxUWP
         public const byte PCB_XMAS = 90;
     }
 
-    enum PCBVersion
+    public enum PCBVersion
     {
         Unknown,
         v1_0,
@@ -39,14 +39,14 @@ namespace GBxUWP
         XMAS
     }
 
-    enum Voltage
+    public enum Voltage
     {
         Unknown,
         Gameboy,
         GameboyAdvance
     }
 
-    class ControllerState : INotifyPropertyChanged, INotifyPropertyChanging
+    public class ControllerState : INotifyPropertyChanged, INotifyPropertyChanging
     {
         public event PropertyChangingEventHandler PropertyChanging;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -120,7 +120,7 @@ namespace GBxUWP
         }
     }
 
-    class Controller : IDisposable
+    public class Controller : IDisposable
     {
         private SerialPort _serial;
         private ControllerState _state;

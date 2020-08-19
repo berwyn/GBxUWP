@@ -3,7 +3,7 @@ using Windows.UI.Xaml.Data;
 
 namespace GBxUWP.Converters
 {
-    class CartridgeMapperToString : IValueConverter
+    public class CartridgeMapperToString : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {

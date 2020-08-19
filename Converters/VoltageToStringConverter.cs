@@ -4,7 +4,7 @@ using Windows.UI.Xaml.Data;
 
 namespace GBxUWP.Converters
 {
-    class VoltageToStringConverter : IValueConverter
+    public class VoltageToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
