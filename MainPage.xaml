@@ -1,0 +1,63 @@
+﻿<Page
+    x:Class="GBxUWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GBxUWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Padding="16">
+            <Button x:Name="ConnectButton"
+                    d:Content="Connect"
+                    Content="{x:Bind _connectLabel, Mode=OneWay}"
+                    Click="Connect_Click" />
+
+            <muxc:RadioButtons x:Name="VoltageButtons"
+                               Header="Mode"
+                               MaxColumns="2"
+                               Margin="0,16,0,0"
+                               IsEnabled="{x:Bind _state.CanSetVoltage, Mode=OneWay}"
+                               SelectedItem="{x:Bind _state.BoardVoltage, Mode=OneWay, Converter={StaticResource VoltageToStringConverter}}"
+                               SelectionChanged="VoltageButtons_SelectionChanged">
+                <x:String>Gameboy</x:String>
+                <x:String>Gameboy Advance</x:String>
+            </muxc:RadioButtons>
+
+            <Button x:Name="ReadHeader"
+                    Margin="0,16,0,0"
+                    Content="Read Header"
+                    Click="ReadHeader_Click"
+                    IsEnabled="{x:Bind _state.IsOpen, Mode=OneWay}" />
+        </StackPanel>
+
+        <Grid VerticalAlignment="Bottom" Padding="16" ColumnSpacing="8" RowSpacing="8" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0">Title:</TextBlock>
+            <TextBlock Grid.Column="1"
+                       Text="{x:Bind _header.Title, Mode=OneWay}"
+                       d:Text="POKEMON_SILVAAXJ" />
+
+            <TextBlock Grid.Column="0" Grid.Row="1">Mapper:</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="1"
+                       Text="{x:Bind _header.Mapper, Mode=OneWay, Converter={StaticResource MapperToStringConverter}}"
+                       d:Text="MBC3 + Timer + RAM + Battery" />
+        </Grid>
+    </Grid>
+</Page>
