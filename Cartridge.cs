@@ -38,7 +38,7 @@
         MBC5_RUMBLE = 0x1C,
         MBC5_RUMBLE_RAM = 0x1D,
         MBC5_RUMBLE_RAM_BATTERY = 0x1E,
-        
+
         MBC6 = 0x20,
 
         MBC7_SENSOR_RUMBLE_RAM_BATTERY = 0x22,
@@ -133,6 +133,79 @@
         public CartridgeType Type { get; set; }
         public bool SGBEnhanced { get; set; }
         public CartridgeMapperType Mapper { get; set; }
+        public uint RomBanks { get; set; }
+        public uint RamBanks { get; set; }
+        public bool ChecksumValid { get; set; }
+
+        public string RomText
+        {
+            get
+            {
+                switch (RomBanks)
+                {
+                    case 0:
+                        return "32KB";
+                    case 4:
+                        return "64KB (4 banks)";
+                    case 8:
+                        return "128KB (8 banks)";
+                    case 16:
+                        return "256KB (16 banks)";
+                    case 32:
+                        return "512KB (32 banks)";
+                    case 63:
+                        return "1MB (63 banks)";
+                    case 64:
+                        return "1MB (64 banks)";
+                    case 125:
+                        return "2MB (125 banks)";
+                    case 128:
+                        return "2MB (128 banks)";
+                    case 256:
+                        return "4MB (256 banks)";
+
+                    case 72:
+                        return "1.1MB (72 banks)";
+                    case 80:
+                        return "1.2MB (80 banks)";
+                    case 96:
+                        return "1.5MB (96 banks)";
+
+                    default:
+                        return "Unknown";
+                }
+            }
+        }
+
+        public string RamText
+        {
+            get
+            {
+                switch (RamBanks)
+                {
+                    case 0:
+                        return "0KB";
+                    case 1:
+                        return "8KB";
+                    case 4:
+                        return "32KB (4 banks of 8KB)";
+                    case 16:
+                        return "128KB (16 banks of 8KB)";
+                    case 8:
+                        return "64KB (8 banks of 8KB)";
+                    default:
+                        return "Unknown";
+                }
+            }
+        }
+
+        public string ChecksumText
+        {
+            get
+            {
+                return ChecksumValid ? "OK" : "Invalid";
+            }
+        }
     }
 
     public class Cartridge

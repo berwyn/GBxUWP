@@ -59,17 +59,35 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Column="0">Title:</TextBlock>
-            <TextBlock Grid.Column="1"
+            <TextBlock Grid.Column="0" Grid.Row="0">Title</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="0"
                        Text="{x:Bind Header.Title, Mode=OneWay}"
                        d:Text="POKEMON_SILVAAXJ" />
 
-            <TextBlock Grid.Column="0" Grid.Row="1">Mapper:</TextBlock>
+            <TextBlock Grid.Column="0" Grid.Row="1">Mapper</TextBlock>
             <TextBlock Grid.Column="1" Grid.Row="1"
                        Text="{x:Bind Header.Mapper, Mode=OneWay, Converter={StaticResource MapperToStringConverter}}"
                        d:Text="MBC3 + Timer + RAM + Battery" />
+
+            <TextBlock Grid.Column="0" Grid.Row="2">ROM Size</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="2"
+                       Text="{x:Bind Header.RomText, Mode=OneWay}"
+                       d:Text="1MB (64 banks)" />
+
+            <TextBlock Grid.Column="0" Grid.Row="3">RAM Size</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="3"
+                       Text="{x:Bind Header.RamText, Mode=OneWay}"
+                       d:Text="32KB (4 banks of 8KB)" />
+            
+            <TextBlock Grid.Column="0" Grid.Row="4">Checksum</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="4"
+                       Text="{x:Bind Header.ChecksumText, Mode=OneWay}"
+                       d:Text="32KB (4 banks of 8KB)" />
         </Grid>
     </Grid>
 </UserControl>

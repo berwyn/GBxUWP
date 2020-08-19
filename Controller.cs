@@ -246,14 +246,44 @@ namespace GBxUWP
             }
 
             var title = Encoding.ASCII.GetString(headerBuffer, 0x134, cartType == CartridgeType.Gameboy ? 16 : 15);
+            var sgeEnhanced = headerBuffer[0x146] == 0x03;
+            var mapper = (CartridgeMapperType)headerBuffer[0x147];
+            var romSize = headerBuffer[0x148];
+            var ramSize = headerBuffer[0x149];
 
+            uint romBanks = 2;
+            if (romSize > 1)
+            {
+                romBanks = 2u << romSize;
+            }
+
+            uint ramBanks = 0;
+            if (mapper == CartridgeMapperType.MBC2_BATTERY)
+                ramBanks = 1;
+            if (ramSize == 2)
+                ramBanks = 1;
+            else if (ramSize == 3)
+                ramBanks = 4;
+            else if (ramSize == 4)
+                ramBanks = 16;
+            else if (ramSize == 5)
+                ramBanks = 8;
+
+            byte checkSum = 0;
+            for (var i = 0x134; i <= 0x14C; i++)
+            {
+                checkSum = (byte)(checkSum - headerBuffer[i] - 1);
+            }
 
             return new CartridgeHeader
             {
                 Title = title,
                 Type = cartType,
-                SGBEnhanced = headerBuffer[0x146] == 0x03,
-                Mapper = (CartridgeMapperType)headerBuffer[0x147]
+                SGBEnhanced = sgeEnhanced,
+                Mapper = mapper,
+                RomBanks = romBanks,
+                RamBanks = ramBanks,
+                ChecksumValid = checkSum == headerBuffer[0x14D],
             };
         }
 
