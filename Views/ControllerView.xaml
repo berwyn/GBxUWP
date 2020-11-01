@@ -8,7 +8,7 @@
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     mc:Ignorable="d"
-    d:DesignHeight="300"
+    d:DesignHeight="500"
     d:DesignWidth="400">
 
     <Grid>
@@ -47,6 +47,13 @@
                     HorizontalAlignment="Stretch"
                     d:Content="Read Header"
                     Click="ReadHeader_Click"
+                    IsEnabled="{x:Bind State.IsOpen, Mode=OneWay}" />
+            <Button x:Name="ReadROMButton"
+                    x:Uid="ReadROM"
+                    Margin="0,16,0,0"
+                    HorizontalAlignment="Stretch"
+                    d:Content="Read ROM"
+                    Click="ReadROM_Click"
                     IsEnabled="{x:Bind State.IsOpen, Mode=OneWay}" />
         </StackPanel>
 

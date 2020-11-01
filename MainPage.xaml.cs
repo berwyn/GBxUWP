@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -54,6 +55,14 @@ namespace GBxUWP
 
             _header = _controller.ReadGameboyHeader();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(_header)));
+        }
+
+        private void ControllerView_ROMSaveRequested(object sender, Views.ROMSaveRequestedArgs e)
+        {
+            Task.Run(async () =>
+            {
+                await _controller.ReadROMAsync(_header, e.SaveLocation);
+            });
         }
     }
 }

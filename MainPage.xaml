@@ -17,7 +17,8 @@
                                  Header="{x:Bind _header, Mode=OneWay}"
                                  VoltageChanged="ControllerView_VoltageChanged"
                                  OpenConnection="ControllerView_OpenConnection"
-                                 ReadHeader="ControllerView_ReadHeader" />
+                                 ReadHeader="ControllerView_ReadHeader"
+                                 ROMSaveRequested="ControllerView_ROMSaveRequested" />
         </SplitView.Pane>
     </SplitView>
 </Page>

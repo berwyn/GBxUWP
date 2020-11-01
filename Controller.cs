@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace GBxUWP
 {
@@ -19,6 +23,7 @@ namespace GBxUWP
         public const byte COMMAND_READ_ROM_RAM = (byte)'R';
 
         public const byte COMMAND_SET_START_ADDRESS = (byte)'A';
+        public const byte COMMAND_SET_BANK = (byte)'B';
 
         public const byte COMMAND_MODE_GAMEBOY = 1;
         public const byte COMMAND_MODE_GAMEBOY_ADVANCE = 2;
@@ -287,6 +292,111 @@ namespace GBxUWP
             };
         }
 
+        public async Task ReadROMAsync(CartridgeHeader header, StorageFolder saveLocation)
+        {
+            var contentBuffer = new List<byte>();
+            var currentAddress = 0x0000;
+            var targetAddress = 0x7FFF;
+
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
+
+            SetMode(Constants.COMMAND_RESET);
+            SetMode(Constants.COMMAND_SET_START_ADDRESS, currentAddress);
+            SetMode(Constants.COMMAND_READ_ROM_RAM);
+
+            for (ushort bank = 1; bank < header.RomBanks; bank++)
+            {
+                if (header.RomBanks > 2)
+                {
+                    // MBC2 and larger
+                    if ((byte)header.Mapper >= 5)
+                    {
+                        SetBank(0x2100, bank);
+                        if (bank >= 256)
+                        {
+                            // Handle high bit(s)
+                            SetBank(0x3000, 1);
+                        }
+                    }
+                    else
+                    {
+                        // Set the mode
+                        SetBank(0x6000, 0);
+                        // Set 0b01100000
+                        SetBank(0x4000, (ushort)(bank >> 5));
+                        // Set 0b00011111
+                        SetBank(0x2000, (ushort)(bank & 0x1F));
+                    }
+                }
+
+                if (bank > 1)
+                    currentAddress = 0x4000;
+
+                SetMode(Constants.COMMAND_SET_START_ADDRESS, currentAddress);
+                SetMode(Constants.COMMAND_READ_ROM_RAM);
+
+                var currentBuffer = new byte[0xFFFF];
+                while (currentAddress < targetAddress)
+                {
+                    try
+                    {
+                        var numberRead = _serial.Read(currentBuffer, currentAddress, 64);
+                        currentAddress += numberRead;
+
+                        if (currentAddress < targetAddress)
+                        {
+                            SetMode(Constants.COMMAND_CONTINUE);
+                        }
+                    }
+                    catch (TimeoutException)
+                    {
+                        Debug.WriteLine("Bytes not ready!");
+                        Thread.Sleep(500);
+
+                        SetMode(Constants.COMMAND_SET_START_ADDRESS, (byte)currentAddress);
+                        SetMode(Constants.COMMAND_READ_ROM_RAM);
+
+                        continue;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Unable to complete read!");
+                    }
+                }
+
+                if (bank > 1)
+                {
+                    var segment = new ArraySegment<byte>(currentBuffer, 0x4000, 0x8000 - 0x4000);
+                    contentBuffer.AddRange(segment);
+                }
+                else
+                {
+                    contentBuffer.AddRange(currentBuffer);
+                }
+            }
+
+            try
+            {
+                var safeTitle = header.Title.Replace('\0', ' ');
+                var saveFile = await saveLocation.CreateFileAsync($"{safeTitle}.gb", CreationCollisionOption.ReplaceExisting);
+
+                using (var transaction = await saveFile.OpenTransactedWriteAsync())
+                using (var dataWriter = new DataWriter(transaction.Stream))
+                {
+                    dataWriter.WriteBytes(contentBuffer.ToArray());
+                    await dataWriter.StoreAsync();
+                    await transaction.CommitAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unable to save file!");
+            }
+
+            SetMode(0);
+        }
+
         private byte ReadPCBVerion()
         {
             return RequestValue(Constants.COMMAND_READ_PCB_VERSION);
@@ -309,6 +419,19 @@ namespace GBxUWP
             _serial.DiscardInBuffer();
 
             return value;
+        }
+
+        private void SetBank(ushort address, ushort bank)
+        {
+            var commandText = string.Format("{0:c}{1:x}", (char)Constants.COMMAND_SET_BANK, address);
+            _serial.Write(commandText);
+            _serial.Write(new byte[] { 0 }, 0, 1);
+            Thread.Sleep(5);
+
+            commandText = string.Format("{0:c}{1:d}", (char)Constants.COMMAND_SET_BANK, bank);
+            _serial.Write(commandText);
+            _serial.Write(new byte[] { 0 }, 0, 1);
+            Thread.Sleep(5);
         }
 
         private void SetMode(byte command)

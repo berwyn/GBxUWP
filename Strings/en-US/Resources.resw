@@ -132,4 +132,7 @@
   <data name="ReadHeader.Content" xml:space="preserve">
     <value>Read Header</value>
   </data>
+  <data name="ReadROM.Content" xml:space="preserve">
+    <value>Read ROM</value>
+  </data>
 </root>

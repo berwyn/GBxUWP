@@ -1,5 +1,10 @@
-﻿using GBxUWP.Converters;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using GBxUWP.Converters;
 using Windows.ApplicationModel.Resources;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -17,11 +22,24 @@ namespace GBxUWP.Views
 
     public delegate void VoltageChangedEventHandler(object sender, VoltageChangedEventArgs e);
 
+    public class ROMSaveRequestedArgs
+    {
+        public readonly StorageFolder SaveLocation;
+
+        public ROMSaveRequestedArgs(StorageFolder saveLocation)
+        {
+            SaveLocation = saveLocation;
+        }
+    }
+
+    public delegate void ROMSaveRequestedEventHandler(object sender, ROMSaveRequestedArgs e);
+
     public sealed partial class ControllerView : UserControl
     {
         public event RoutedEventHandler OpenConnection;
         public event RoutedEventHandler ReadHeader;
         public event VoltageChangedEventHandler VoltageChanged;
+        public event ROMSaveRequestedEventHandler ROMSaveRequested;
 
         public ControllerState State
         {
@@ -78,6 +96,28 @@ namespace GBxUWP.Views
         private void ReadHeader_Click(object sender, RoutedEventArgs e)
         {
             ReadHeader?.Invoke(this, new RoutedEventArgs());
+        }
+
+        private async void ReadROM_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var folderPicker = new FolderPicker()
+                {
+                    ViewMode = PickerViewMode.List,
+                    SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+                };
+
+                folderPicker.FileTypeFilter.Add("*");
+
+                var targetFolder = await folderPicker.PickSingleFolderAsync().AsTask();
+
+                ROMSaveRequested?.Invoke(this, new ROMSaveRequestedArgs(targetFolder));
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine("Failed to pick file!");
+            }
         }
     }
 }
